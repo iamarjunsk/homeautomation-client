@@ -16,6 +16,13 @@ class Switch_status(db.Model):
     def __repr__(self):
         return f"switch1:{self.switch1}, switch2:{self.switch2}, switch3:{self.switch3}"
 
+class AuthCode(db.Model):
+    id = db.Column(db.Integer,primary_key = True)
+    code = db.Column(db.String)
+
+    def __repr__(self):
+        return f"code:{self.code}"
+
 
 app.debug=True
 @app.route('/')
@@ -30,19 +37,22 @@ def home():
 
 @app.route('/getdata', methods=['POST'])
 def data():
-    # print(request.form.get('switch1'))
     d = request.json['switch']
+    c = request.json['code']
     try:
         status = Switch_status.query.one()
-        if(d == "switch1"):
-            status.switch1 = not status.switch1
-            db.session.commit()
-        elif(d == "switch2"):
-            status.switch2 = not status.switch2
-            db.session.commit()
-        elif(d == "switch3"):
-            status.switch3 = not status.switch3
-            db.session.commit()
+        codeData = AuthCode.query.one()
+        if(codeData.code == c):
+            print("success")
+            if(d == "switch1"):
+                status.switch1 = not status.switch1
+                db.session.commit()
+            elif(d == "switch2"):
+                status.switch2 = not status.switch2
+                db.session.commit()
+            elif(d == "switch3"):
+                status.switch3 = not status.switch3
+                db.session.commit()
         print(status)
     except:
         print("ERror")
